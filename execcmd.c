@@ -10,7 +10,7 @@ int execcmd(char **cmd, char *errormsg)
 {
 	int execode;
 
-	execode = execve(cmd[0], cmd, NULL);
+	execode = execve(cmd[0], cmd, environ);
 	_perror(errormsg);
 
 	return (execode);
