@@ -10,7 +10,7 @@ This is a custom implementation of a UNIX shell alias simple shell, its a requir
  
 1. Allowed editors: vim, vi,emacs.
 2. All files were compiled on Ubuntu 20.04 LTS using gcc, using the options * -Wall -Werror -Wextra -pedantic -std=gnu89*
-3. Betty coding standards
+3. Betty coding standard
 
 ### *Fetaures*
 In our simple shell we tried to incoporate significant functions so as tohave as to ensure that the shell functionality is as smooth as possible. These functions are the following;
