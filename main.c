@@ -18,12 +18,10 @@ int main(int ac, char *argv[])
 	if (isatty(STDIN_FILENO) != 1)
 	{
 		execres = shelln_int(&line, &len, argv[0]);
-		if (execres != 0)
-			return (-1);
 	}
 	else
 	{
-		shell_int(&line, &len, argv[0]);
+		execres = shell_int(&line, &len, argv[0]);
 	}
-	return (0);
+	return (execres);
 }

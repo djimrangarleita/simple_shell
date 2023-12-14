@@ -37,21 +37,29 @@ int shell_int(char **line, size_t *len, char *pname)
 		if (*line[0] != '\n')
 		{
 			toks = _strtok(*line, " \t\n");
-			btin = is_btin(toks[0]);
 
-			if (btin)
+			if (!toks || !toks[0])
 			{
-				btin(toks, pname);
+				_perror("Usage: [command] [arg]");
 			}
 			else
 			{
-				path = findxpath(toks[0]);
-				free(toks[0]);
-				toks[0] = path;
+				btin = is_btin(toks[0]);
+				if (btin)
+				{
+					if (_strcmp(toks[0], "exit") == 0)
+						return (btin(toks, pname));
+				}
+				else
+				{
+					path = findxpath(toks[0]);
+					free(toks[0]);
+					toks[0] = path;
 
-				readx(toks, pname, buf, &child_pid);
+					readx(toks, pname, buf, &child_pid);
+				}
+				free_toks(toks);
 			}
-			free_toks(toks);
 		}
 	}
 	free(*line);
@@ -76,26 +84,29 @@ int shelln_int(char **line, size_t *len, char *pname)
 	readcmd(line, len);
 	toks = _strtok(*line, " \t\n");
 
-	btin = is_btin(toks[0]);
-	if (!toks[0])
+	if (!toks || !toks[0])
 	{
-		_printf("Usage: %s: [command] [argument]\n", pname);
-		return (-1);
-	}
-	if (btin)
-	{
-		execres = btin(toks, pname);
+		_perror("Usage: [command] [arg]");
 	}
 	else
 	{
-		path = findxpath(toks[0]);
-		free(toks[0]);
-		toks[0] = path;
+		btin = is_btin(toks[0]);
+		if (btin)
+		{
+			if (_strcmp(toks[0], "exit") == 0)
+				return (btin(toks, pname));
+			execres = btin(toks, pname);
+		}
+		else
+		{
+			path = findxpath(toks[0]);
+			free(toks[0]);
+			toks[0] = path;
 
-		execres = readx(toks, pname, buf, &child_pid);
+			execres = readx(toks, pname, buf, &child_pid);
+		}
+		free_toks(toks);
 	}
-
-	free_toks(toks);
 	free(*line);
 
 	return (execres);

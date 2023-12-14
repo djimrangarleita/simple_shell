@@ -30,12 +30,12 @@ char *_strcat(char *dest, char *src)
 	while (dest[i] != '\0')
 		i++;
 
-	for (; i <= destlen + srclen; i++)
+	for (; i < destlen + srclen; i++)
 	{
 		dest[i] = src[j];
 		j++;
 	}
-
+	dest[i] = '\0';
 	return (dest);
 }
 
@@ -70,10 +70,11 @@ char *_strcpy(char *dest, char *src)
 	int i, srclen = 0;
 
 	srclen = _strlen(src);
-	for (i = 0; i <= srclen; i++)
+	for (i = 0; i < srclen; i++)
 	{
 		dest[i] = src[i];
 	}
+	dest[i] = '\0';
 
 	return (dest);
 }

@@ -70,14 +70,10 @@ int _exitsh(char **cmd, char *errormsg)
 {
 	int code = 0;
 
-	if (cmd[1])
+	if (cmd[1] && errormsg)
 		code = atoi(cmd[1]);
-
 	free_toks(cmd);
-	exit(code);
-	_perror(errormsg);
-
-	return (-1);
+	return (code);
 }
 
 /**
