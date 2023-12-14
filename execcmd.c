@@ -37,7 +37,6 @@ int shell_int(char **line, size_t *len, char *pname)
 		if (*line[0] != '\n')
 		{
 			toks = _strtok(*line, " \t\n");
-
 			if (!toks || !toks[0])
 			{
 				_perror("Usage: [command] [arg]");
@@ -49,13 +48,13 @@ int shell_int(char **line, size_t *len, char *pname)
 				{
 					if (_strcmp(toks[0], "exit") == 0)
 						return (btin(toks, pname));
+					btin(toks, pname);
 				}
 				else
 				{
 					path = findxpath(toks[0]);
 					free(toks[0]);
 					toks[0] = path;
-
 					readx(toks, pname, buf, &child_pid);
 				}
 				free_toks(toks);
@@ -63,7 +62,6 @@ int shell_int(char **line, size_t *len, char *pname)
 		}
 	}
 	free(*line);
-
 	return (0);
 }
 
