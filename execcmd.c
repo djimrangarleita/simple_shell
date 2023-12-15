@@ -26,17 +26,17 @@ int execcmd(char **cmd, char *errormsg)
 int shell_int(char **line, size_t *len, char *pname)
 {
 	char *path, **toks;
-	int (*btin)(char **, char *);
+	int (*btin)(char **, char *), size;
 	pid_t child_pid;
 	struct stat buf;
 
 	while (1)
 	{
 		_printf("($) ");
-		readcmd(line, len);
+		size = readcmd(line, len);
 		if (*line[0] != '\n')
 		{
-			toks = _strtok(*line, " \t\n");
+			toks = _strtok(*line, size);
 			if (!toks || !toks[0])
 			{
 				_perror("Usage: [command] [arg]");
@@ -57,11 +57,11 @@ int shell_int(char **line, size_t *len, char *pname)
 					toks[0] = path;
 					readx(toks, pname, buf, &child_pid);
 				}
-				free_toks(toks);
 			}
 		}
 	}
-	free(*line);
+	free_toks(toks);
+	/*free(*line);*/
 	return (0);
 }
 
@@ -75,12 +75,12 @@ int shell_int(char **line, size_t *len, char *pname)
 int shelln_int(char **line, size_t *len, char *pname)
 {
 	char *path, **toks;
-	int execres, (*btin)(char **, char *);
+	int execres, (*btin)(char **, char *), size;
 	pid_t child_pid;
 	struct stat buf;
 
-	readcmd(line, len);
-	toks = _strtok(*line, " \t\n");
+	size = readcmd(line, len);
+	toks = _strtok(*line, size);
 
 	if (!toks || !toks[0])
 	{
@@ -103,9 +103,9 @@ int shelln_int(char **line, size_t *len, char *pname)
 
 			execres = readx(toks, pname, buf, &child_pid);
 		}
-		free_toks(toks);
 	}
-	free(*line);
+	/*free(*line);*/
+	free_toks(toks);
 
 	return (execres);
 }

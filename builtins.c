@@ -73,6 +73,7 @@ int _exitsh(char **cmd, char *errormsg)
 	if (cmd[1] && errormsg)
 		code = atoi(cmd[1]);
 	free_toks(cmd);
+	/*exit(code);*/
 	return (code);
 }
 

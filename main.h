@@ -49,7 +49,7 @@ int execcmd(char **cmd, char *errormsg);
 int _printenv(char **cmd, char *errormsg);
 int _cd(char **cmd, char *errormsg);
 int _exitsh(char **cmd, char *errormsg);
-char **_strtok(char *str, char *delim);
+char **_strtok(char *str, int size);
 void free_toks(char **tokens);
 char *findxpath(char *input);
 int readcmd(char **line, size_t *len);
