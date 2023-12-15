@@ -22,8 +22,8 @@ In our simple shell we tried to incoporate significant functions so as tohave as
 . *perror:* Displays the error message.
 . *stat:* Gets information about files.
 . *wait:* Suspending execution until a child process is complete.
-. *strtok:*
-. *execres:* 
+. *strtok:* Will tokenize strings into a sequence of tokens 
+. *execres:* Holds the exit status of a child process executed by the shell 
 
 ### *Mandatory tasks*
 
