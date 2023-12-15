@@ -47,7 +47,10 @@ int shell_int(char **line, size_t *len, char *pname)
 				if (btin)
 				{
 					if (_strcmp(toks[0], "exit") == 0)
+					{
+						free(*line);
 						return (btin(toks, pname));
+					}
 					btin(toks, pname);
 				}
 				else
@@ -58,10 +61,10 @@ int shell_int(char **line, size_t *len, char *pname)
 					readx(toks, pname, buf, &child_pid);
 				}
 			}
+			free_toks(toks);
 		}
 	}
-	free_toks(toks);
-	/*free(*line);*/
+	free(*line);
 	return (0);
 }
 
@@ -92,7 +95,10 @@ int shelln_int(char **line, size_t *len, char *pname)
 		if (btin)
 		{
 			if (_strcmp(toks[0], "exit") == 0)
+			{
+				free(*line);
 				return (btin(toks, pname));
+			}
 			execres = btin(toks, pname);
 		}
 		else
@@ -104,7 +110,7 @@ int shelln_int(char **line, size_t *len, char *pname)
 			execres = readx(toks, pname, buf, &child_pid);
 		}
 	}
-	/*free(*line);*/
+	free(*line);
 	free_toks(toks);
 
 	return (execres);

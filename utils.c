@@ -13,50 +13,53 @@ char **_strtok(char *str, int size)
 	int i, j, toksnum = 0;
 	char *tok, *cpstr, **toks;
 
-	if (!str || !str[0])
+	if (!str || !str[0] || size <= 0)
 		return (NULL);
 	/*copy chars read instead of _strdup*/
-	cpstr = malloc((size + 1) * sizeof(char));
+	cpstr = malloc((strlen(str) + 1) * sizeof(char));
 	if (!cpstr)
 	{
 		_perror("Error: Memory allocation");
 		return (NULL);
 	}
-	_strcpy(cpstr, str);
-	tok = strtok(cpstr, DELIMS);
+	cpstr = _strcpy(cpstr, str);
+	tok = strtok(str, DELIMS);
 	while (tok != NULL)
 	{
 		if (tok[0] == '#')
 			break;
-		_printf("Token: %s\n", tok);
 		tok = strtok(NULL, DELIMS);
 		toksnum++;
 	}
-	_printf("Num of tokens is: %d\n", toksnum);
 	toks = malloc(sizeof(char *) * (toksnum + 1));
 
-	tok = strtok(str, DELIMS);
-	for (i = 0; i < toksnum; i++)
+	tok = strtok(cpstr, DELIMS);
+	i = 0;
+	while (tok != NULL)
 	{
 		if (tok[0] == '#')
 			break;
-		toks[i] = malloc(sizeof(char) * _strlen(tok) + 1);
+		//toks[i] = malloc(sizeof(char) * (_strlen(tok) + 1));
+		//toks[i] = _strdup(tok);
+		toks[i] = _strdup(tok);
 		if (!toks[i])
 		{
 			for (j = 0; j < i; j++)
 			{
 				free(toks[i]);
 			}
-			free(cpstr);
+			//free(str);
 			free(toks);
+			_perror("Error: Memory allocation");
 			return (NULL);
 		}
-		_strcpy(toks[i], tok);
+		//toks[i] = _strcpy(toks[i], tok);
 		tok = strtok(NULL, DELIMS);
+		i++;
 	}
 	toks[i] = NULL;
 	free(cpstr);
-	free(str);
+	//free(str);
 	return (toks);
 }
 
