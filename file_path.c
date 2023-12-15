@@ -41,7 +41,7 @@ char *findxpath(char *input)
  * makexpath - make full path to an exec
  * @input: user input, cmd,
  * @curpath: current token
- * Return: pointer to the path
+ * Return: Pointer to the path
  */
 char *makexpath(char *input, char *curpath)
 {
