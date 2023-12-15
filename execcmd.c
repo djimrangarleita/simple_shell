@@ -18,114 +18,58 @@ int execcmd(char **cmd, char *errormsg)
 
 /**
  * shell_int - interactive shell
- * @line: ptr to list of args
- * @len: ptr to size_t var, length of line
  * @pname: program name, to print alongside error msg
  * Return: int indicating exec status
  */
-int shell_int(char **line, size_t *len, char *pname)
+int shell_int(char *pname)
 {
-	char *path, **toks;
-	int (*btin)(char **, char *), size;
+	char **lines;
 	pid_t child_pid;
 	struct stat buf;
 
 	while (1)
 	{
 		_printf("($) ");
-		size = readcmd(line, len);
-		if (*line[0] != '\n')
-		{
-			toks = _strtok(*line, size);
-			if (!toks || !toks[0])
-			{
-				_perror("Usage: [command] [arg]");
-			}
-			else
-			{
-				btin = is_btin(toks[0]);
-				if (btin)
-				{
-					if (_strcmp(toks[0], "exit") == 0)
-					{
-						free(*line);
-						return (btin(toks, pname));
-					}
-					btin(toks, pname);
-				}
-				else
-				{
-					path = findxpath(toks[0]);
-					free(toks[0]);
-					toks[0] = path;
-					readx(toks, pname, buf, &child_pid);
-				}
-			}
-			free_toks(toks);
-		}
+		lines = get_inputs();
+
+		runcmds(lines, pname, buf, &child_pid);
+
+		free_toks(lines);
 	}
-	free(*line);
 	return (0);
 }
 
 /**
  * shelln_int - non interactive version of the shell
- * @line: ptd to stdin inputs
- * @len: size_t var, length of stdin
  * @pname: name of the program, print alongside error msg
  * Return: int, exec status
  */
-int shelln_int(char **line, size_t *len, char *pname)
+int shelln_int(char *pname)
 {
-	char *path, **toks;
-	int execres, (*btin)(char **, char *), size;
+	int execres;
 	pid_t child_pid;
+	char **lines;
 	struct stat buf;
 
-	size = readcmd(line, len);
-	toks = _strtok(*line, size);
+	lines = get_inputs();
 
-	if (!toks || !toks[0])
-	{
-		_perror("Usage: [command] [arg]");
-	}
-	else
-	{
-		btin = is_btin(toks[0]);
-		if (btin)
-		{
-			if (_strcmp(toks[0], "exit") == 0)
-			{
-				free(*line);
-				return (btin(toks, pname));
-			}
-			execres = btin(toks, pname);
-		}
-		else
-		{
-			path = findxpath(toks[0]);
-			free(toks[0]);
-			toks[0] = path;
-
-			execres = readx(toks, pname, buf, &child_pid);
-		}
-	}
-	free(*line);
-	free_toks(toks);
-
+	execres = runcmds(lines, pname, buf, &child_pid);
+	free_toks(lines);
 	return (execres);
 }
 
 /**
- * readx - read and execute program
+ * statxcmd - read and execute program
  * @toks: tokenized cmd
  * @pname: name of the program
  * @buf: buffer, will hold result of stat
  * @child_pid: will hold the pid of process
  * Return: int, exec status
  */
-int readx(char **toks, char *pname, struct stat buf, pid_t *child_pid)
+int statxcmd(char **toks, char *pname, struct stat buf, pid_t *child_pid)
 {
+	int status = 0;
+
 	if (stat(toks[0], &buf) != 0)
 	{
 		_perror(pname);
@@ -141,7 +85,7 @@ int readx(char **toks, char *pname, struct stat buf, pid_t *child_pid)
 		}
 		else if (*child_pid == 0)
 		{
-			execcmd(toks, pname);
+			status = execcmd(toks, pname);
 		}
 		else
 		{
@@ -149,5 +93,56 @@ int readx(char **toks, char *pname, struct stat buf, pid_t *child_pid)
 		}
 	}
 
-	return (0);
+	return (status);
+}
+
+/**
+ * runcmds - takes parsed cmd lines and run it
+ * @lines: set of commands to be exec
+ * @pname: name of the program
+ * @buf: struct buf
+ * @child_pid: pid of child process
+ * Return: exec status
+ */
+int runcmds(char **lines, char *pname, struct stat buf, pid_t *child_pid)
+{
+	int size, i, (*btin)(char **, char *), status = 0;
+	char *path, **toks;
+
+	for (i = 0; lines && lines[i]; i++)
+	{
+		size = _strlen(lines[i]);
+		toks = _strtok(lines[i], size, " \t");
+		if (!toks || !toks[0])
+		{
+			_perror("Usage: [command] [arg]");
+		}
+		else
+		{
+			btin = is_btin(toks[0]);
+			if (btin)
+			{
+				if (_strcmp(toks[0], "exit") == 0)
+				{
+					status = btin(toks, pname);
+					if (status >= 0)
+					{
+						free_toks(lines);
+						exit(status);
+					}
+					return (status);
+				}
+				status = btin(toks, pname);
+			}
+			else
+			{
+				path = findxpath(toks[0]);
+				free(toks[0]);
+				toks[0] = path;
+				status = statxcmd(toks, pname, buf, child_pid);
+			}
+		}
+		free_toks(toks);
+	}
+	return (status);
 }

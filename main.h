@@ -49,14 +49,17 @@ int execcmd(char **cmd, char *errormsg);
 int _printenv(char **cmd, char *errormsg);
 int _cd(char **cmd, char *errormsg);
 int _exitsh(char **cmd, char *errormsg);
-char **_strtok(char *str, int size);
+char **_strtok(char *line, int size, char *delim);
 void free_toks(char **tokens);
 char *findxpath(char *input);
-int readcmd(char **line, size_t *len);
 int (*is_btin(char *cmd))(char **cmd, char *errormsg);
-int shelln_int(char **line, size_t *len, char *pname);
-int shell_int(char **line, size_t *len, char *pname);
-int readx(char **toks, char *pname, struct stat buf, pid_t *child_pid);
-char *getdir(char *dirkey, char *path);
+int shelln_int(char *pname);
+int shell_int(char *pname);
+int statxcmd(char **toks, char *pname, struct stat buf, pid_t *child_pid);
+char *getdir(char *dirkey);
+int gettoksnum(char *line, int size, char *delim);
+char **get_inputs();
+int runcmds(char **lines, char *pname, struct stat buf, pid_t *child_pid);
+char *makexpath(char *input, char *curpath);
 
 #endif

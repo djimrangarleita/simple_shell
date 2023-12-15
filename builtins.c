@@ -11,12 +11,12 @@ int _printenv(char **cmd, char *errormsg)
 	int i;
 
 	i = 0;
-	while (cmd && environ[i] != NULL)
+	while (cmd && environ && environ[i])
 	{
 		_printf("%s\n", environ[i++]);
 	}
 
-	if (i <= 0)
+	if (i < 0)
 	{
 		_perror(errormsg);
 		return (-1);
@@ -34,20 +34,25 @@ int _cd(char **cmd, char *errormsg)
 {
 	char buf[1024], *ptr;
 	char oldpwd[500], *ptroldpwd;
+	char *tmp = NULL;
 
 	ptroldpwd = getcwd(oldpwd, 500);
-	if (!cmd[1] || _strcmp(cmd[1], "~") == 0)
+	tmp = _strdup(cmd[1]);
+	if (!tmp || _strcmp(tmp, "~") == 0)
 	{
-		cmd[1] = getdir("HOME", cmd[1]);
+		free(tmp);
+		tmp = getdir("HOME");
 	}
-	else if (_strcmp(cmd[1], "-") == 0)
+	else if (_strcmp(tmp, "-") == 0)
 	{
-		cmd[1] = getdir("OLDPWD", cmd[1]);
+		free(tmp);
+		tmp = getdir("OLDPWD");
 	}
 
-	if (chdir(cmd[1]) != 0)
+	if (chdir(tmp) != 0)
 	{
 		_perror(errormsg);
+		free(tmp);
 		return (-1);
 	}
 	else
@@ -56,6 +61,7 @@ int _cd(char **cmd, char *errormsg)
 		setenv("PWD", ptr, 1);
 		setenv("OLDPWD", ptroldpwd, 1);
 	}
+	free(tmp);
 
 	return (0);
 }
@@ -73,7 +79,7 @@ int _exitsh(char **cmd, char *errormsg)
 	if (cmd[1] && errormsg)
 		code = atoi(cmd[1]);
 	free_toks(cmd);
-	/*exit(code);*/
+
 	return (code);
 }
 
@@ -106,29 +112,27 @@ int (*is_btin(char *cmd))(char **cmd, char *errormsg)
 /**
  * getdir - get full path to a given directory
  * @dirkey: env var key
- * @path: user input path
  * Return: char ptr to the path or NULL
  */
-char *getdir(char *dirkey, char *path)
+char *getdir(char *dirkey)
 {
 	int i = 0;
-	char *key, *val, *tmpenv = NULL;
+	char *key, *val, *tmpenv, *dir;
 
-	while (environ[i] != NULL)
+	while (environ && environ[i])
 	{
 		tmpenv = _strdup(environ[i]);
 		key = strtok(tmpenv, "=");
 		val = strtok(NULL, "=");
 		if (_strcmp(key, dirkey) == 0)
 		{
-			free(path);
-			path = _strdup(val);
+			dir = _strdup(val);
 			free(tmpenv);
-			return (path);
+			return (dir);
 		}
+		free(tmpenv);
 		i++;
 	}
 
-	free(tmpenv);
 	return (NULL);
 }
