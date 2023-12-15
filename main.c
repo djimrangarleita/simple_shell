@@ -8,8 +8,6 @@
  */
 int main(int ac, char *argv[])
 {
-	size_t len = 0;
-	char *line = NULL;
 	int execres;
 
 	if (ac < 1)
@@ -17,11 +15,11 @@ int main(int ac, char *argv[])
 
 	if (isatty(STDIN_FILENO) != 1)
 	{
-		execres = shelln_int(&line, &len, argv[0]);
+		execres = shelln_int(argv[0]);
 	}
 	else
 	{
-		execres = shell_int(&line, &len, argv[0]);
+		execres = shell_int(argv[0]);
 	}
 	return (execres);
 }
