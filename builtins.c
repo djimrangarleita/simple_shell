@@ -27,7 +27,7 @@ int _printenv(char **cmd, char *errormsg)
 /**
  * _cd - change directory using chdir() func
  * @cmd: cd cmd with args
- * @errormsg: error msg in case cd fail
+ * @errormsg: error message in case cd fail
  * Return: 0 on success, -1 otherwise
  */
 int _cd(char **cmd, char *errormsg)
