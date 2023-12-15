@@ -2,7 +2,7 @@
 
 /**
  * execcmd - execute cmd,
- * @cmd: the cmd to be executed
+ * @cmd: The cmd to be executed
  * @errormsg: error msg to print in case execve fails
  * Return: exec code indicating error
  */
@@ -62,8 +62,8 @@ int shelln_int(char *pname)
  * statxcmd - read and execute program
  * @toks: tokenized cmd
  * @pname: name of the program
- * @buf: buffer, will hold result of stat
- * @child_pid: will hold the pid of process
+ * @buf: buffer, holds the result of stat
+ * @child_pid: holds the pid of process
  * Return: int, exec status
  */
 int statxcmd(char **toks, char *pname, struct stat buf, pid_t *child_pid)
