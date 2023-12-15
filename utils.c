@@ -1,19 +1,20 @@
 #include "main.h"
 
 /**
- * gettoksdelim - get number of tokens for malloc
- * @line - single line read from stdin
+ * gettoksnum - get number of tokens for malloc
+ * @line: single line read from stdin
  * @size: size of line
+ * @delim: delimiters
  * Return: Int, number of toks
  */
 int gettoksnum(char *line, int size, char *delim)
 {
 	int toksnum = 0;
 	char *cpstr, *tok;
-	
+
 	if (size <= 0 || !line || !line[0])
 		return (0);
-	
+
 	cpstr = _strdup(line);
 	if (!cpstr)
 		return (0);
@@ -45,7 +46,7 @@ char **_strtok(char *line, int size, char *delim)
 	toksnum = gettoksnum(line, size, delim);
 	if (toksnum <= 0)
 		return (NULL);
-	
+
 	toks = malloc(sizeof(char *) * (toksnum + 1));
 	if (!toks)
 		return (NULL);
@@ -70,45 +71,8 @@ char **_strtok(char *line, int size, char *delim)
 		i++;
 	}
 	toks[i] = NULL;
-	
+
 	return (toks);
-}
-
-/**
- * findxpath - find full path of an executable
- * @input: ptr to user's path
- * Return: full path of an exec or input
- */
-char *findxpath(char *input)
-{
-	int i;
-	char *key, *val, *pathexec, *tmpenv = NULL;
-
-	if (*input == '/')
-	{
-		return (_strdup(input));
-	}
-
-	i = 0;
-	while (environ && environ[i] != NULL)
-	{
-		tmpenv = _strdup(environ[i]);
-		key = strtok(tmpenv, "=");
-		val = strtok(NULL, "=");
-		if (_strcmp(key, "PATH") == 0)
-		{
-			pathexec = makexpath(input, val);
-			if (pathexec)
-			{
-				free(tmpenv);
-				return (pathexec);
-			}
-		}
-		free(tmpenv);
-		i++;
-	}
-
-	return (_strdup(input));
 }
 
 /**
@@ -125,26 +89,9 @@ void free_toks(char **tokens)
 }
 
 /**
- * readcmd - use getline func to read user input
- * @line: ptr to stdin
- * @len: length of elt
- * Return: chars read or exit -1
+ * get_inputs - read user inputs from stdin and parse lines
+ * Return: Array ptr to toks/lines
  */
-/*int readcmd(char **line, size_t *len)
-{
-	int rchars;
-
-	rchars = getline(line, len, stdin);
-	if (rchars == -1)
-	{
-		_perror("Exiting shell...");
-		free(*line);
-		exit(-1);
-	}
-
-	return (rchars);
-}
-*/
 char **get_inputs()
 {
 	char **toks;
@@ -158,7 +105,7 @@ char **get_inputs()
 		_printf("Exiting shell...\n");
 		exit(0);
 	}
-	else if(size < 0)
+	else if (size < 0)
 	{
 		_perror("Error: ");
 		exit(1);
@@ -168,40 +115,4 @@ char **get_inputs()
 	free(line);
 
 	return (toks);
-}
-
-/**
- * makexpath - make full path to an exec
- * @input: user input, cmd,
- * @curpath: current token
- * Return: pointer to the path
- */
-char *makexpath(char *input, char *curpath)
-{
-	char *path, *tmp, *tmpcat, *pathexec;
-	struct stat buf;
-	
-	path = strtok(curpath, ":");
-	while (path != NULL)
-	{
-		tmp = malloc((_strlen(path) + _strlen(input) + 2) * sizeof(char));
-		if (!tmp)
-		{
-			return (_strdup(input));
-		}
-		tmp = _strcpy(tmp, path);
-		tmp = _strcat(tmp, "/");
-		tmpcat = _strcat(tmp, input);
-		if (stat(tmpcat, &buf) == 0)
-		{
-			pathexec = malloc((_strlen(tmpcat) + 1) * sizeof(char));
-			pathexec = _strcpy(pathexec, tmpcat);
-			free(tmp);
-			return (pathexec);
-		}
-		path = strtok(NULL, ":");
-		free(tmp);
-	}
-
-	return (NULL);
 }

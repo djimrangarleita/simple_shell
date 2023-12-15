@@ -15,7 +15,6 @@ int main(int ac, char *argv[])
 
 	if (isatty(STDIN_FILENO) != 1)
 	{
-		//execres = shelln_int(&line, &len, argv[0]);
 		execres = shelln_int(argv[0]);
 	}
 	else
