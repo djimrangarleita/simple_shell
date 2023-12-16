@@ -72,7 +72,7 @@ int statxcmd(char **toks, char *pname, struct stat buf, pid_t *child_pid)
 
 	if (stat(toks[0], &buf) != 0)
 	{
-		dprintf(STDERR_FILENO, "%s: %d: %s: not found\n", pname, errno, toks[0]);
+		dprintf(STDERR_FILENO, "%s: 1: %s: not found\n", pname, toks[0]);
 		return (-1);
 	}
 	else
