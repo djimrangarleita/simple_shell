@@ -95,11 +95,11 @@ void free_toks(char **tokens)
 char **get_inputs()
 {
 	char **toks;
-	char buf[1024] = {'\0'};
+	char buf[2048] = {'\0'};
 	int size;
 	char *line;
 
-	size = read(STDIN_FILENO, buf, 1024);
+	size = read(STDIN_FILENO, buf, 2048);
 	if (size == 0)
 	{
 		_printf("Exiting shell...\n");

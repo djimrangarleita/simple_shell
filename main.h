@@ -8,6 +8,8 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <ctype.h>
+#include <errno.h>
 
 extern char **environ;
 

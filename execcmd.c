@@ -72,7 +72,7 @@ int statxcmd(char **toks, char *pname, struct stat buf, pid_t *child_pid)
 
 	if (stat(toks[0], &buf) != 0)
 	{
-		_perror(pname);
+		dprintf(STDERR_FILENO, "%s: %d: %s: not found\n", pname, errno, toks[0]);
 		return (-1);
 	}
 	else
@@ -115,7 +115,7 @@ int runcmds(char **lines, char *pname, struct stat buf, pid_t *child_pid)
 		toks = _strtok(lines[i], size, " \t");
 		if (!toks || !toks[0])
 		{
-			_perror("Usage: [command] [arg]");
+			return (0);
 		}
 		else
 		{

@@ -74,10 +74,21 @@ int _cd(char **cmd, char *errormsg)
  */
 int _exitsh(char **cmd, char *errormsg)
 {
-	int code = 0;
+	int code = 2;
 
 	if (cmd[1] && errormsg)
-		code = atoi(cmd[1]);
+	{
+		if (isdigit(cmd[1][0]) != 0 || atoi(cmd[1]) > 0)
+		{
+			code = atoi(cmd[1]);
+		}
+		else
+		{
+			dprintf(2, "%s: 1: exit: Illegal number: %s\n", errormsg, cmd[1]);
+			free_toks(cmd);
+			return (-1);
+		}
+	}
 	free_toks(cmd);
 
 	return (code);
