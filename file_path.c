@@ -72,3 +72,59 @@ char *makexpath(char *input, char *curpath)
 
 	return (NULL);
 }
+
+/**
+ * getdir - get full path to a given directory
+ * @dirkey: env var key
+ * Return: char ptr to the path or NULL
+ */
+char *getdir(char *dirkey)
+{
+	int i = 0;
+	char *key, *val, *tmpenv, *dir;
+
+	while (environ && environ[i])
+	{
+		tmpenv = _strdup(environ[i]);
+		key = strtok(tmpenv, "=");
+		val = strtok(NULL, "=");
+		if (_strcmp(key, dirkey) == 0)
+		{
+			dir = _strdup(val);
+			free(tmpenv);
+			return (dir);
+		}
+		free(tmpenv);
+		i++;
+	}
+
+	return (NULL);
+}
+
+/**
+ * is_btin - check if cmd is a builtin cmd
+ * @cmd: string representing the cmd
+ * Return: ptr to function, the builtin func
+ */
+int (*is_btin(char *cmd))(char **toks)
+{
+	int i;
+	btin_t btincmd[] = {
+		{"env", _printenv},
+		{"cd", _cd},
+		{"exit", _exitsh},
+		{"setenv", _setenv},
+		{"unsetenv", _unsetenv},
+		{NULL, NULL}
+	};
+
+	i = 0;
+	while (cmd && btincmd[i].name != NULL)
+	{
+		if (_strcmp(cmd, btincmd[i].name) == 0)
+			return (btincmd[i].func);
+		i++;
+	}
+
+	return (NULL);
+}

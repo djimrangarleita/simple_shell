@@ -47,10 +47,18 @@ char *_strcat(char *dest, char *src)
  */
 int _strcmp(char *s1, char *s2)
 {
-	int i, s1len = 0;
+	int i;
 
-	s1len = _strlen(s1);
-	for (i = 0; i <= s1len; i++)
+	if (!s1 && !s2)
+		return (0);
+
+	if (!s1)
+		return ((int)s2[0]);
+
+	if (!s2)
+		return ((int)s1[0]);
+
+	for (i = 0; s1 && i <= _strlen(s1); i++)
 	{
 		if (s1[i] != s2[i])
 			return (s1[i] - s2[i]);

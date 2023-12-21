@@ -9,7 +9,6 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <ctype.h>
-#include <errno.h>
 
 extern char **environ;
 
@@ -32,7 +31,7 @@ typedef struct pfunc_t
 typedef struct btin_t
 {
 	char *name;
-	int (*func)(char **cmd, char *errormsg);
+	int (*func)(char **cmd);
 } btin_t;
 int _printf(const char *format, ...);
 char *_strcat(char *dest, char *src);
@@ -42,26 +41,32 @@ int _strcmp(char *s1, char *s2);
 int _strlen(char *str);
 int print_str(char *str, int len);
 int ppstr(va_list ap, char *spec);
-void _perror(char *errormsg);
 int ppchar(va_list ap, char *spec);
 int put_char(char c);
 int print_num(int n);
 int ppnum(va_list ap, char *spec);
-int execcmd(char **cmd, char *errormsg);
-int _printenv(char **cmd, char *errormsg);
-int _cd(char **cmd, char *errormsg);
-int _exitsh(char **cmd, char *errormsg);
+int execcmd(char **cmd);
+int _printenv(char **cmd);
+int _cd(char **cmd);
+int _exitsh(char **cmd);
+int _setenv(char **cmd);
+int _unsetenv(char **cmd);
 char **_strtok(char *line, int size, char *delim);
 void free_toks(char **tokens);
 char *findxpath(char *input);
-int (*is_btin(char *cmd))(char **cmd, char *errormsg);
+int (*is_btin(char *cmd))(char **cmd);
 int shelln_int(char *pname);
 int shell_int(char *pname);
-int statxcmd(char **toks, char *pname, struct stat buf, pid_t *child_pid);
+int statxcmd(char **toks);
 char *getdir(char *dirkey);
 int gettoksnum(char *line, int size, char *delim);
-char **get_inputs();
-int runcmds(char **lines, char *pname, struct stat buf, pid_t *child_pid);
+char **get_inputs(int *status);
+int runcmds(char **lines, char *pname, int *status);
 char *makexpath(char *input, char *curpath);
+int _printerr(int status, char **cmd, char *pname, char *input);
+int _pxiterr(char **cmd, char *pname);
+int _plserr(char **cmd, char *input);
+int _pcderr(char **cmd, char *pname);
+char *_realloc(char *ptr, int old_size, int newsize);
 
 #endif
