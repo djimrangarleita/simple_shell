@@ -46,7 +46,7 @@ int _printerr(int status, char **cmd, char *pname, char *input)
  */
 int _pxiterr(char **cmd, char *pname)
 {
-	dprintf(STDERR_FILENO, "%s: 1: Illegal number: %s\n", pname, cmd[1]);
+	dprintf(STDERR_FILENO, "%s: 1: exit: Illegal number: %s\n", pname, cmd[1]);
 
 	return (2);
 }
