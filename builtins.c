@@ -88,8 +88,8 @@ int _exitsh(char **cmd)
  */
 int _setenv(char **cmd)
 {
-	if (cmd[1] && !cmd[2])
-		return (139);
+	if (!cmd[1] || !cmd[2])
+		return (setenv("", "", 1));
 	return (setenv(cmd[1], cmd[2], 1));
 }
 
