@@ -90,29 +90,75 @@ void free_toks(char **tokens)
 
 /**
  * get_inputs - read user inputs from stdin and parse lines
+ * @status: ptr to last execution status
  * Return: Array ptr to toks/lines
  */
-char **get_inputs()
+char **get_inputs(int *status)
 {
-	char **toks;
-	char buf[2048] = {'\0'};
-	int size;
-	char *line;
+	int size, hasred = 0, buffsize = 1025;
+	char *tmp, *buffer, **toks;
 
-	size = read(STDIN_FILENO, buf, 2048);
-	if (size == 0)
-	{
-		_printf("Exiting shell...\n");
-		exit(0);
-	}
-	else if (size < 0)
-	{
-		_perror("Error: ");
-		exit(1);
-	}
-	line = _strdup(buf);
-	toks = _strtok(line, size, "\n;&");
-	free(line);
-
+	buffer = malloc(buffsize * sizeof(char));
+	if (!buffer)
+		return (NULL);
+	buffer[0] = '\0';
+	do {
+		tmp = malloc(sizeof(char) * 1025);
+		size = read(STDIN_FILENO, tmp, 1024);
+		if (size < 0)
+		{
+			free(buffer);
+			free(tmp);
+			_printerr(1, NULL, "Error", NULL);
+			exit(1);
+		}
+		if (size == 0 && !hasred)
+		{
+			free(tmp);
+			free(buffer);
+			_printf("Exiting shell...\n");
+			exit(*status);
+		}
+		tmp[size] = '\0';
+		buffer = _strcat(buffer, tmp);
+		if (size >= 1024)
+		{
+			buffer = _realloc(buffer, buffsize, buffsize + size);
+			buffsize += size;
+		}
+		free(tmp);
+		hasred = 1;
+	} while (size >= 1024);
+	toks = _strtok(buffer, size, "\n;&");
+	free(buffer);
 	return (toks);
+}
+
+/**
+ * _realloc - reallocate mem
+ * @old_size: old size of ptr
+ * @newsize: size of new mem block
+ * @ptr: pointer to old block
+ * Return: char pointer or NULL
+ */
+char *_realloc(char *ptr, int old_size, int newsize)
+{
+	char *newptr;
+
+	if (newsize == 0 && ptr != NULL)
+	{
+		free(ptr);
+		return (NULL);
+	}
+	if (newsize == old_size)
+		return (ptr);
+
+	newptr = malloc(newsize);
+	if (ptr == NULL)
+		return (newptr);
+
+	newptr = _strcpy(newptr, ptr);
+	free(ptr);
+
+	return (newptr);
 }

@@ -3,17 +3,11 @@
 /**
  * execcmd - execute cmd,
  * @cmd: The cmd to be executed
- * @errormsg: error msg to print in case execve fails
  * Return: exec code indicating error
  */
-int execcmd(char **cmd, char *errormsg)
+int execcmd(char **cmd)
 {
-	int execode;
-
-	execode = execve(cmd[0], cmd, environ);
-	_perror(errormsg);
-
-	return (execode);
+	return (execve(cmd[0], cmd, environ));
 }
 
 /**
@@ -24,19 +18,19 @@ int execcmd(char **cmd, char *errormsg)
 int shell_int(char *pname)
 {
 	char **lines;
-	pid_t child_pid;
-	struct stat buf;
+	int execres = 0;
 
 	while (1)
 	{
 		_printf("($) ");
-		lines = get_inputs();
+		lines = get_inputs(&execres);
 
-		runcmds(lines, pname, buf, &child_pid);
+		execres = runcmds(lines, pname, &execres);
 
 		free_toks(lines);
 	}
-	return (0);
+
+	return (execres);
 }
 
 /**
@@ -46,103 +40,101 @@ int shell_int(char *pname)
  */
 int shelln_int(char *pname)
 {
-	int execres;
-	pid_t child_pid;
+	int execres = 0;
 	char **lines;
-	struct stat buf;
 
-	lines = get_inputs();
+	lines = get_inputs(&execres);
 
-	execres = runcmds(lines, pname, buf, &child_pid);
+	execres = runcmds(lines, pname, &execres);
 	free_toks(lines);
+
 	return (execres);
-}
-
-/**
- * statxcmd - read and execute program
- * @toks: tokenized cmd
- * @pname: name of the program
- * @buf: buffer, holds the result of stat
- * @child_pid: holds the pid of process
- * Return: int, exec status
- */
-int statxcmd(char **toks, char *pname, struct stat buf, pid_t *child_pid)
-{
-	int status = 0;
-
-	if (stat(toks[0], &buf) != 0)
-	{
-		dprintf(STDERR_FILENO, "%s: 1: %s: not found\n", pname, toks[0]);
-		return (-1);
-	}
-	else
-	{
-		*child_pid = fork();
-		if (*child_pid == -1)
-		{
-			_perror("Error:");
-			return (-1);
-		}
-		else if (*child_pid == 0)
-		{
-			status = execcmd(toks, pname);
-		}
-		else
-		{
-			wait(NULL);
-		}
-	}
-
-	return (status);
 }
 
 /**
  * runcmds - takes parsed cmd lines and run it
  * @lines: set of commands to be exec
  * @pname: name of the program
- * @buf: struct buf
- * @child_pid: pid of child process
+ * @status: last/prev execution status
  * Return: exec status
  */
-int runcmds(char **lines, char *pname, struct stat buf, pid_t *child_pid)
+int runcmds(char **lines, char *pname, int *status)
 {
-	int size, i, (*btin)(char **, char *), status = 0;
-	char *path, **toks;
+	int size, i, (*btin)(char **);
+	char *tmp, **toks, *path;
 
 	for (i = 0; lines && lines[i]; i++)
 	{
 		size = _strlen(lines[i]);
 		toks = _strtok(lines[i], size, " \t");
-		if (!toks || !toks[0])
+		if (toks && toks[0])
 		{
-			return (0);
-		}
-		else
-		{
+			/* check if any tok == || or && */
 			btin = is_btin(toks[0]);
+			tmp = _strdup(toks[0]);
 			if (btin)
 			{
-				if (_strcmp(toks[0], "exit") == 0)
+				if (_strcmp(toks[0], "exit") != 0 || toks[1])
+					*status = btin(toks);
+				if (_strcmp(toks[0], "exit") == 0 && *status >= 0)
 				{
-					status = btin(toks, pname);
-					if (status >= 0)
-					{
-						free_toks(lines);
-						exit(status);
-					}
-					return (status);
+					free(tmp);
+					free_toks(toks);
+					free_toks(lines);
+					exit(*status);
 				}
-				status = btin(toks, pname);
 			}
 			else
 			{
 				path = findxpath(toks[0]);
 				free(toks[0]);
 				toks[0] = path;
-				status = statxcmd(toks, pname, buf, child_pid);
+				*status = statxcmd(toks);
 			}
+			if (*status != 0)
+				*status = _printerr(*status, toks, pname, tmp);
+			free(tmp);
 		}
 		free_toks(toks);
 	}
-	return (status);
+	return (*status);
+}
+
+/**
+ * statxcmd - read and execute program
+ * @toks: tokenized cmd
+ * Return: int, exec status
+ */
+int statxcmd(char **toks)
+{
+	int status, statusCode = 0;
+	struct stat buf;
+	pid_t child_pid;
+
+	if (stat(toks[0], &buf) != 0)
+	{
+		return (127);
+	}
+	else
+	{
+		child_pid = fork();
+		if (child_pid == -1)
+		{
+			return (-1);
+		}
+		else if (child_pid == 0)
+		{
+			execcmd(toks);
+		}
+		else
+		{
+			wait(&status);
+			if (WIFEXITED(status))
+			{
+				statusCode = WEXITSTATUS(status);
+			}
+		}
+	}
+
+	return (statusCode);
 }

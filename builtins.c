@@ -3,10 +3,9 @@
 /**
  * _printenv - print env variables
  * @cmd: ptr to the cmd, with its args
- * @errormsg: error msg to print in case of error
  * Return: 0 on success, -1 on failure
  */
-int _printenv(char **cmd, char *errormsg)
+int _printenv(char **cmd)
 {
 	int i;
 
@@ -16,21 +15,15 @@ int _printenv(char **cmd, char *errormsg)
 		_printf("%s\n", environ[i++]);
 	}
 
-	if (i < 0)
-	{
-		_perror(errormsg);
-		return (-1);
-	}
 	return (0);
 }
 
 /**
  * _cd - change directory using chdir() func
  * @cmd: cd cmd with args
- * @errormsg: error message in case cd fail
  * Return: 0 on success, -1 otherwise
  */
-int _cd(char **cmd, char *errormsg)
+int _cd(char **cmd)
 {
 	char buf[1024], *ptr;
 	char oldpwd[500], *ptroldpwd;
@@ -48,10 +41,10 @@ int _cd(char **cmd, char *errormsg)
 		free(tmp);
 		tmp = getdir("OLDPWD");
 	}
-
+	if (!tmp)
+		tmp = _strdup(ptroldpwd);
 	if (chdir(tmp) != 0)
 	{
-		_perror(errormsg);
 		free(tmp);
 		return (-1);
 	}
@@ -60,6 +53,8 @@ int _cd(char **cmd, char *errormsg)
 		ptr = getcwd(buf, 1024);
 		setenv("PWD", ptr, 1);
 		setenv("OLDPWD", ptroldpwd, 1);
+		if (_strcmp(cmd[1], "-") == 0)
+			_printf("%s\n", tmp);
 	}
 	free(tmp);
 
@@ -69,81 +64,41 @@ int _cd(char **cmd, char *errormsg)
 /**
  * _exitsh - exit the shell or any,
  * @cmd: the exit cmd with args, code
- * @errormsg: error message to print, in case exit fail
  * Return: -1 on failure
  */
-int _exitsh(char **cmd, char *errormsg)
+int _exitsh(char **cmd)
 {
-	int code = 2;
+	int code = 0;
 
-	if (cmd[1] && errormsg)
+	if (cmd[1])
 	{
 		if (isdigit(cmd[1][0]) != 0 || atoi(cmd[1]) > 0)
-		{
 			code = atoi(cmd[1]);
-		}
 		else
-		{
-			dprintf(2, "%s: 1: exit: Illegal number: %s\n", errormsg, cmd[1]);
-			free_toks(cmd);
 			return (-1);
-		}
 	}
-	free_toks(cmd);
 
 	return (code);
 }
 
 /**
- * is_btin - check if cmd is a builtin cmd
- * @cmd: string representing the cmd
- * Return: ptr to function, the builtin func
+ * _setenv - set an env var
+ * @cmd: toks with cmd typed
+ * Return: -1 on failure, 0 on success
  */
-int (*is_btin(char *cmd))(char **cmd, char *errormsg)
+int _setenv(char **cmd)
 {
-	int i;
-	btin_t btincmd[] = {
-		{"env", _printenv},
-		{"cd", _cd},
-		{"exit", _exitsh},
-		{NULL, NULL}
-	};
-
-	i = 0;
-	while (cmd && btincmd[i].name != NULL)
-	{
-		if (_strcmp(cmd, btincmd[i].name) == 0)
-			return (btincmd[i].func);
-		i++;
-	}
-
-	return (NULL);
+	if (cmd[1] && !cmd[2])
+		return (139);
+	return (setenv(cmd[1], cmd[2], 1));
 }
 
 /**
- * getdir - get full path to a given directory
- * @dirkey: env var key
- * Return: char ptr to the path or NULL
+ * _unsetenv - unset an env var
+ * @cmd: toks with cmd typed
+ * Return: -1 on failure, 0 on success
  */
-char *getdir(char *dirkey)
+int _unsetenv(char **cmd)
 {
-	int i = 0;
-	char *key, *val, *tmpenv, *dir;
-
-	while (environ && environ[i])
-	{
-		tmpenv = _strdup(environ[i]);
-		key = strtok(tmpenv, "=");
-		val = strtok(NULL, "=");
-		if (_strcmp(key, dirkey) == 0)
-		{
-			dir = _strdup(val);
-			free(tmpenv);
-			return (dir);
-		}
-		free(tmpenv);
-		i++;
-	}
-
-	return (NULL);
+	return (unsetenv(cmd[1]));
 }

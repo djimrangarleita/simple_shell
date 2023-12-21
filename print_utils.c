@@ -36,15 +36,6 @@ int ppstr(va_list ap, char *spec)
 }
 
 /**
- * _perror - print error msg to stderr
- * @errormsg: error msg to print
- */
-void _perror(char *errormsg)
-{
-	perror(errormsg);
-}
-
-/**
  * ppchar - extract char from @va_list
  * @ap: ptr to list of args
  * @spec: format specifier
