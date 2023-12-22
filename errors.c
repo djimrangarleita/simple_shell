@@ -82,3 +82,18 @@ int _pfilerr(int status, char *pname, char *filename)
 
 	return (status);
 }
+
+/**
+ * _preaderr - free buffer and print error msg when read() fails
+ * @buffer: ptr to buffer
+ * @tmp: tmp mem for read ops
+ * Return: 1 for error
+ */
+int _preaderr(char *buffer, char *tmp)
+{
+	free(buffer);
+	free(tmp);
+	perror("Error");
+
+	return (1);
+}

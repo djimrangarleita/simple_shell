@@ -21,19 +21,7 @@ int shell_int(char *pname, char *filename)
 	char **lines;
 	int execres = 0, fd;
 
-	if (!filename)
-	{
-		while (1)
-		{
-			_printf("($) ");
-			lines = get_inputs(&execres, -1);
-
-			execres = runcmds(lines, pname, &execres);
-
-			free_toks(lines);
-		}
-	}
-	else
+	if (filename)
 	{
 		fd = open(filename, O_RDONLY);
 
@@ -42,13 +30,21 @@ int shell_int(char *pname, char *filename)
 			return (_printerr(127, NULL, pname, filename));
 		}
 		lines = get_inputs(&execres, fd);
-
-		execres = runcmds(lines, pname, &execres);
-
-		free_toks(lines);
-		close(fd);
+		if (lines && lines[0])
+		{
+			execres = runcmds(lines, pname, &execres);
+			free_toks(lines);
+			close(fd);
+			return (execres);
+		}
 	}
-
+	while (1)
+	{
+		_printf("($) ");
+		lines = get_inputs(&execres, -1);
+		execres = runcmds(lines, pname, &execres);
+		free_toks(lines);
+	}
 	return (execres);
 }
 

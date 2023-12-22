@@ -70,5 +70,6 @@ int _plserr(char **cmd, char *input);
 int _pcderr(char **cmd, char *pname);
 char *_realloc(char *ptr, int old_size, int newsize);
 int _pfilerr(int status, char *pname, char *filename);
+int _preaderr(char *buffer, char *tmp);
 
 #endif

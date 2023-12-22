@@ -111,15 +111,15 @@ char **get_inputs(int *status, int fd)
 		size = read(insrc, tmp, 1024);
 		if (size < 0)
 		{
-			free(buffer);
-			free(tmp);
-			_printerr(1, NULL, "Error", NULL);
+			_preaderr(buffer, tmp);
 			exit(1);
 		}
 		if (size == 0 && !hasred)
 		{
 			free(tmp);
 			free(buffer);
+			if (fd > 0)
+				return (NULL);
 			_printf("Exiting shell...\n");
 			exit(*status);
 		}
