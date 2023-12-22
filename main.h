@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <ctype.h>
+#include <fcntl.h>
 
 extern char **environ;
 
@@ -55,12 +56,12 @@ char **_strtok(char *line, int size, char *delim);
 void free_toks(char **tokens);
 char *findxpath(char *input);
 int (*is_btin(char *cmd))(char **cmd);
-int shelln_int(char *pname);
-int shell_int(char *pname);
+int shelln_int(char *pname, char *filename);
+int shell_int(char *pname, char *filename);
 int statxcmd(char **toks);
 char *getdir(char *dirkey);
 int gettoksnum(char *line, int size, char *delim);
-char **get_inputs(int *status);
+char **get_inputs(int *status, int fd);
 int runcmds(char **lines, char *pname, int *status);
 char *makexpath(char *input, char *curpath);
 int _printerr(int status, char **cmd, char *pname, char *input);
@@ -68,5 +69,6 @@ int _pxiterr(char **cmd, char *pname);
 int _plserr(char **cmd, char *input);
 int _pcderr(char **cmd, char *pname);
 char *_realloc(char *ptr, int old_size, int newsize);
+int _pfilerr(int status, char *pname, char *filename);
 
 #endif

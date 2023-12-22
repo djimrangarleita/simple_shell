@@ -91,20 +91,24 @@ void free_toks(char **tokens)
 /**
  * get_inputs - read user inputs from stdin and parse lines
  * @status: ptr to last execution status
+ * @fd: file descriptor to read cmds from, if any
  * Return: Array ptr to toks/lines
  */
-char **get_inputs(int *status)
+char **get_inputs(int *status, int fd)
 {
 	int size, hasred = 0, buffsize = 1025;
+	int insrc = STDIN_FILENO;
 	char *tmp, *buffer, **toks;
 
 	buffer = malloc(buffsize * sizeof(char));
 	if (!buffer)
 		return (NULL);
 	buffer[0] = '\0';
+	if (fd > 0)
+		insrc = fd;
 	do {
 		tmp = malloc(sizeof(char) * 1025);
-		size = read(STDIN_FILENO, tmp, 1024);
+		size = read(insrc, tmp, 1024);
 		if (size < 0)
 		{
 			free(buffer);

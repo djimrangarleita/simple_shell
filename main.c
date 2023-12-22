@@ -15,11 +15,11 @@ int main(int ac, char *argv[])
 
 	if (isatty(STDIN_FILENO) != 1)
 	{
-		execres = shelln_int(argv[0]);
+		execres = shelln_int(argv[0], argv[1]);
 	}
 	else
 	{
-		execres = shell_int(argv[0]);
+		execres = shell_int(argv[0], argv[1]);
 	}
 	return (execres);
 }

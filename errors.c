@@ -12,10 +12,14 @@ int _printerr(int status, char **cmd, char *pname, char *input)
 {
 	int errorCode;
 
-	if (status == 127)
+	if (status == 127 && cmd)
 	{
 		dprintf(STDERR_FILENO, "%s: 1: %s: not found\n", pname, cmd[0]);
 		return (status);
+	}
+	else if (status == 127 && !cmd)
+	{
+		errorCode = _pfilerr(status, pname, input);
 	}
 	else if (_strcmp(cmd[0], "exit") == 0)
 	{
@@ -62,4 +66,19 @@ int _pcderr(char **cmd, char *pname)
 	dprintf(STDERR_FILENO, "%s: 1: cd: can't cd to %s\n", pname, cmd[1]);
 
 	return (2);
+}
+
+
+/**
+ * _pfilerr - print file errors
+ * @status: err status code
+ * @pname: name of the program
+ * @filename: name of the file to open
+ * Return: err status, 2
+ */
+int _pfilerr(int status, char *pname, char *filename)
+{
+	dprintf(STDERR_FILENO, "%s: 0: Can't open %s\n", pname, filename);
+
+	return (status);
 }

@@ -13,21 +13,40 @@ int execcmd(char **cmd)
 /**
  * shell_int - interactive shell
  * @pname: program name, to print alongside error msg
+ * @filename: name of a file to read cmds from, if any
  * Return: int indicating exec status
  */
-int shell_int(char *pname)
+int shell_int(char *pname, char *filename)
 {
 	char **lines;
-	int execres = 0;
+	int execres = 0, fd;
 
-	while (1)
+	if (!filename)
 	{
-		_printf("($) ");
-		lines = get_inputs(&execres);
+		while (1)
+		{
+			_printf("($) ");
+			lines = get_inputs(&execres, -1);
+
+			execres = runcmds(lines, pname, &execres);
+
+			free_toks(lines);
+		}
+	}
+	else
+	{
+		fd = open(filename, O_RDONLY);
+
+		if (fd < 0)
+		{
+			return (_printerr(127, NULL, pname, filename));
+		}
+		lines = get_inputs(&execres, fd);
 
 		execres = runcmds(lines, pname, &execres);
 
 		free_toks(lines);
+		close(fd);
 	}
 
 	return (execres);
@@ -36,17 +55,28 @@ int shell_int(char *pname)
 /**
  * shelln_int - non interactive version of the shell
  * @pname: name of the program, print alongside error msg
+ * @filename: name of file to read cmd from, if any
  * Return: int, exec status
  */
-int shelln_int(char *pname)
+int shelln_int(char *pname, char *filename)
 {
 	int execres = 0;
 	char **lines;
+	int fd = -1;
 
-	lines = get_inputs(&execres);
+	if (filename)
+	{
+		fd = open(filename, O_RDONLY);
+		if (fd < 0)
+			return (_printerr(127, NULL, pname, filename));
+	}
+	lines = get_inputs(&execres, fd);
 
 	execres = runcmds(lines, pname, &execres);
 	free_toks(lines);
+
+	if (fd >= 0)
+		close(fd);
 
 	return (execres);
 }
