@@ -15,7 +15,7 @@ char **filter_toks(char **toks, int *prevstatus)
 	i = 0;
 	while (toks && toks[i])
 	{
-		if (toks[i][0] == '$')
+		if (toks[i][0] == '$' && _strcmp(toks[i], "$") != 0)
 		{
 			if (_strcmp(toks[i], "$$") == 0)
 			{
@@ -32,7 +32,6 @@ char **filter_toks(char **toks, int *prevstatus)
 			else
 			{
 				tmp = _strtok(toks[i], _strlen(toks[i]), "$");
-
 				free(toks[i]);
 				toks[i] = _getenv(tmp[0]);
 				free_toks(tmp);
