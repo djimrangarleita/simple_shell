@@ -74,11 +74,11 @@ char *makexpath(char *input, char *curpath)
 }
 
 /**
- * getdir - get full path to a given directory
- * @dirkey: env var key
+ * _getenv - get env value
+ * @envkey: env var key
  * Return: char ptr to the path or NULL
  */
-char *getdir(char *dirkey)
+char *_getenv(char *envkey)
 {
 	int i = 0;
 	char *key, *val, *tmpenv, *dir;
@@ -88,7 +88,7 @@ char *getdir(char *dirkey)
 		tmpenv = _strdup(environ[i]);
 		key = strtok(tmpenv, "=");
 		val = strtok(NULL, "=");
-		if (_strcmp(key, dirkey) == 0)
+		if (_strcmp(key, envkey) == 0)
 		{
 			dir = _strdup(val);
 			free(tmpenv);

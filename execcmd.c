@@ -95,7 +95,9 @@ int runcmds(char **lines, char *pname, int *status)
 		toks = _strtok(lines[i], size, " \t");
 		if (toks && toks[0])
 		{
-			/* check if any tok == || or && */
+			filter_toks(toks, status);
+			if (!toks || !toks[0])
+				return (0);
 			btin = is_btin(toks[0]);
 			tmp = _strdup(toks[0]);
 			if (btin)
@@ -140,6 +142,10 @@ int statxcmd(char **toks)
 	if (stat(toks[0], &buf) != 0)
 	{
 		return (127);
+	}
+	else if ((buf.st_mode & S_IFMT) == S_IFDIR)
+	{
+		return (126);
 	}
 	else
 	{

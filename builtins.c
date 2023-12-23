@@ -34,12 +34,12 @@ int _cd(char **cmd)
 	if (!tmp || _strcmp(tmp, "~") == 0)
 	{
 		free(tmp);
-		tmp = getdir("HOME");
+		tmp = _getenv("HOME");
 	}
 	else if (_strcmp(tmp, "-") == 0)
 	{
 		free(tmp);
-		tmp = getdir("OLDPWD");
+		tmp = _getenv("OLDPWD");
 	}
 	if (!tmp)
 		tmp = _strdup(ptroldpwd);

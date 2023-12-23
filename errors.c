@@ -21,6 +21,10 @@ int _printerr(int status, char **cmd, char *pname, char *input)
 	{
 		errorCode = _pfilerr(status, pname, input);
 	}
+	else if (status == 126)
+	{
+		errorCode = _pcmdisfolder(pname, cmd);
+	}
 	else if (_strcmp(cmd[0], "exit") == 0)
 	{
 		errorCode = _pxiterr(cmd, pname);
@@ -84,16 +88,14 @@ int _pfilerr(int status, char *pname, char *filename)
 }
 
 /**
- * _preaderr - free buffer and print error msg when read() fails
- * @buffer: ptr to buffer
- * @tmp: tmp mem for read ops
- * Return: 1 for error
+ * _pcmdisfolder - user entered folder name as cmd, print err
+ * @pname: program name
+ * @cmd: user cmd
+ * Return: err status
  */
-int _preaderr(char *buffer, char *tmp)
+int _pcmdisfolder(char *pname, char **cmd)
 {
-	free(buffer);
-	free(tmp);
-	perror("Error");
+	dprintf(STDERR_FILENO, "%s: 1: %s: Permission denied\n", pname, cmd[0]);
 
-	return (1);
+	return (126);
 }

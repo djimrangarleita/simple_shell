@@ -59,7 +59,7 @@ int (*is_btin(char *cmd))(char **cmd);
 int shelln_int(char *pname, char *filename);
 int shell_int(char *pname, char *filename);
 int statxcmd(char **toks);
-char *getdir(char *dirkey);
+char *_getenv(char *envkey);
 int gettoksnum(char *line, int size, char *delim);
 char **get_inputs(int *status, int fd);
 int runcmds(char **lines, char *pname, int *status);
@@ -71,5 +71,8 @@ int _pcderr(char **cmd, char *pname);
 char *_realloc(char *ptr, int old_size, int newsize);
 int _pfilerr(int status, char *pname, char *filename);
 int _preaderr(char *buffer, char *tmp);
+char **filter_toks(char **toks, int *prevstatus);
+char **shift_toks(char **toks, int pos);
+int _pcmdisfolder(char *pname, char **cmd);
 
 #endif
