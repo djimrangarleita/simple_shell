@@ -40,7 +40,7 @@ int shell_int(char *pname, char *filename)
 	}
 	while (1)
 	{
-		_printf("($) ");
+		_printf("(proudly-made-by-George and Djimra$) ");
 		lines = get_inputs(&execres, -1);
 		execres = runcmds(lines, pname, &execres);
 		free_toks(lines);
